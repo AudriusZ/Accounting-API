@@ -1,0 +1,220 @@
+import pandas as pd
+import os
+import pdfplumber
+import re
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
+import shutil
+
+
+class TransactionData:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.data = None
+        self.rejected_data = None
+
+    def read_data(self):
+        try:
+            self.data = pd.read_csv(self.file_path, parse_dates=['Date'])
+        except FileNotFoundError:
+            print("The file was not found.")
+        except pd.errors.EmptyDataError:
+            print("The file is empty.")
+        except pd.errors.ParserError:
+            print("The file is not in a valid CSV format.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+    
+    def get_months(self):
+        """
+        Returns a list of unique months from the 'Date' column.
+        """
+        if self.data is not None:
+            return self.data['Date'].dt.strftime('%b').dropna().unique()
+        return []
+
+    def filter_by_month(self, month):
+        if self.data is not None:
+            # Convert 'Date' to datetime if not already
+            if not pd.api.types.is_datetime64_any_dtype(self.data['Date']):
+                self.data['Date'] = pd.to_datetime(self.data['Date'], errors='coerce')
+
+            # Ensure month format is abbreviated (e.g., 'Jan', 'Feb', etc.)
+            month_date = pd.to_datetime('01 ' + month + ' 2000', format='%d %b %Y')
+            
+            # Calculate the next month
+            next_month_date = month_date + relativedelta(months=1)
+            next_month = next_month_date.strftime('%b')
+
+            # Filter data by month and the consecutive month
+            is_selected_month = self.data['Date'].dt.strftime('%b') == month
+            is_next_month = self.data['Date'].dt.strftime('%b') == next_month
+
+            # Combine the two conditions
+            combined_filter = is_selected_month | is_next_month
+
+            self.rejected_data = self.data[~combined_filter]
+            self.data = self.data[combined_filter]
+        else:
+            print("Data is not loaded. Please load the data first.")
+
+    def get_data(self):
+        """
+        Returns the data that was read from the CSV.
+
+        :return: pandas.DataFrame or None - the data read from the CSV
+        """
+        return self.data
+
+    def get_teams(self):
+        """
+        Returns a list of unique teams from the 'Team' column.
+        """
+        if self.data is not None and 'Team' in self.data.columns:
+            return self.data['Team'].dropna().unique()
+        return []
+
+    def filter_by_team(self, team_name):
+        """
+        Filters the data to include only the records from the specified team.
+        """
+        if self.data is not None:
+            self.data = self.data[self.data['Team'] == team_name]
+        else:
+            print("Data is not loaded or no data available to filter.")
+
+    def organize_data(self):
+        if self.data is not None:
+            # Sorting data by 'Type'
+            self.data.sort_values(by='Type', inplace=True)
+
+            # Filtering and collecting 'Hourly' and 'Service Fee' data
+            hourly_data = self.data[self.data['Type'] == 'Hourly']
+            service_fee_data = self.data[self.data['Type'] == 'Service Fee']
+
+            # Collecting Date, Amounts, and Ref IDs into lists
+            sales = list(zip(hourly_data['Date'], hourly_data['Ref ID'], hourly_data['Amount']))
+            commissions = list(zip(service_fee_data['Date'], service_fee_data['Ref ID'], service_fee_data['Amount']))
+
+            return sales, commissions
+        else:
+            print("Data is not loaded or not available.")
+            return [], []
+
+    def save_summary(self, sales, commissions, folder_path):
+        if sales or commissions:
+            # Calculate totals
+            total_sales = sum([amount for _, _, _, _, amount in sales])
+            total_commissions = sum([amount for _, _, _, _, amount in commissions])
+            balance = total_sales + total_commissions
+
+            # Format date and team name for folder creation
+            if sales:
+                date = sales[0][2]  # Invoice date from the first tuple of sales
+                folder_date = datetime.strptime(date, "%b %d, %Y").strftime('%Y-%m')
+                team = self.data['Team'].iloc[0]  # Assuming team data is valid and present
+            else:
+                date = commissions[0][2]  # Invoice date from the first tuple of commissions
+                folder_date = datetime.strptime(date, "%b %d, %Y").strftime('%Y-%m')
+                team = self.data['Team'].iloc[0]
+
+            # Create a directory for summary
+            folder_name = f"{folder_date}_{team}"
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+            
+            # Create subfolders for sales and commissions
+            sales_folder = os.path.join(folder_name, 'sales')
+            commissions_folder = os.path.join(folder_name, 'commissions')
+           
+            # Delete the existing sales folder and its contents
+            if os.path.exists(sales_folder):
+                shutil.rmtree(sales_folder)
+            # Recreate the sales folder
+            os.makedirs(sales_folder)
+            
+            if os.path.exists(commissions_folder):
+                shutil.rmtree(commissions_folder)
+            os.makedirs(commissions_folder)
+
+            # Save to a CSV file            
+            summary_file_path = f"{folder_name}/{folder_name}.csv"
+            with open(summary_file_path, 'w') as file:                
+                file.write(f"Total Sales,{total_sales:.2f}\n")
+                file.write(f"Total Commissions,{total_commissions:.2f}\n")
+                file.write(f"Balance,{balance:.2f}\n")
+                
+                # Write payment references line to the summary file
+                payment_references = ', '.join([f"T{invoice_number}" for _, _, _, invoice_number, _ in sales])
+                payment_line = f"Upwork Global Inc is the agent of payment for this invoice. Payment references: {payment_references}\n"
+                file.write(payment_line)
+
+                # Write data for sales directly into the summary file
+                file.write("\nSales\n")
+                file.write("Date,Ref ID,Invoice Date,Invoice Number,Amount\n")
+                for timestamp, ref_id, invoice_date, invoice_number, amount in sales:
+                    date_only = timestamp.strftime('%Y-%m-%d')
+                    file.write(f"\"{date_only}\",{ref_id},\"{invoice_date}\",{invoice_number},{amount:.2f}\n")
+                
+                # Write data for commissions directly into the summary file
+                file.write("\nCommissions\n")
+                file.write("Date,Ref ID,Invoice Date,Invoice Number,Amount\n")
+                for timestamp, ref_id, invoice_date, invoice_number, amount in commissions:
+                    date_only = timestamp.strftime('%Y-%m-%d')
+                    file.write(f"\"{date_only}\",{ref_id},\"{invoice_date}\",{invoice_number},{amount:.2f}\n")
+
+                # Copy relevant PDF invoices to sales and commissions folders
+                for timestamp, ref_id, _, _, _ in sales:
+                    src_pdf = os.path.join(folder_path, f"T{ref_id}.pdf")
+                    dst_pdf = os.path.join(sales_folder, f"T{ref_id}.pdf")
+                    shutil.copy(src_pdf, dst_pdf)
+
+                for timestamp, ref_id, _, _, _ in commissions:
+                    src_pdf = os.path.join(folder_path, f"T{ref_id}.pdf")
+                    dst_pdf = os.path.join(commissions_folder, f"T{ref_id}.pdf")
+                    shutil.copy(src_pdf, dst_pdf)
+
+            print(f"Data saved to {summary_file_path}")
+        else:
+            print("No data available to save.")
+
+    def get_data(self):
+        return self.data
+    
+    def extract_pdf_data(self, ref_ids, folder_path):
+        pdf_data = {}
+        for ref_id in ref_ids:
+            file_name = f"T{ref_id}.pdf"
+            file_path = os.path.join(folder_path, file_name)
+            try:
+                with pdfplumber.open(file_path) as pdf:
+                    page = pdf.pages[0]
+                    text = page.extract_text()
+                    print(f"Processing file: {file_path}")  # Print the current PDF file being processed
+                    #print(text)  # Optionally print the text for debugging
+
+                    # Adjusted Regex to match the invoice example you provided
+                    invoice_number_pattern = r"INVOICE\s*#\s*(T\d+)"
+                    date_pattern = r"DATE\s*(\w+ \d{1,2}, \d{4})"
+
+                    invoice_number = re.search(invoice_number_pattern, text, re.IGNORECASE)
+                    invoice_date = re.search(date_pattern, text, re.IGNORECASE)
+
+                    if invoice_number and invoice_date:
+                        invoice_number = invoice_number.group(1)
+                        invoice_date = invoice_date.group(1)
+                        pdf_data[ref_id] = {'Invoice Number': invoice_number, 'Date': invoice_date}
+                    else:
+                        pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+
+            except FileNotFoundError:
+                print(f"File not found: {file_path}")
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+            except Exception as e:
+                print(f"Error processing file {file_path}: {str(e)}")
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+
+        return pdf_data
+
+
+    
