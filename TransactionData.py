@@ -25,6 +25,9 @@ class TransactionData:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
     
+    def get_data(self):
+            return self.data
+
     def get_months(self):
         """
         Returns a list of unique months from the 'Date' column.
@@ -58,13 +61,30 @@ class TransactionData:
         else:
             print("Data is not loaded. Please load the data first.")
 
-    def get_data(self):
-        """
-        Returns the data that was read from the CSV.
+    def filter_by_invoice_month(self, month):
+        if self.data is not None:
+            # Convert 'Date' to datetime if not already
+            if not pd.api.types.is_datetime64_any_dtype(self.data['Invoice Date']):
+                self.data['Invoice Date'] = pd.to_datetime(self.data['Invoice Date'], errors='coerce')
 
-        :return: pandas.DataFrame or None - the data read from the CSV
-        """
-        return self.data
+            # Ensure month format is abbreviated (e.g., 'Jan', 'Feb', etc.)
+            month_date = pd.to_datetime('01 ' + month + ' 2000', format='%d %b %Y')
+            
+            # Calculate the next month
+            #next_month_date = month_date + relativedelta(months=1)
+            #next_month = next_month_date.strftime('%b')
+
+            # Filter data by month and the consecutive month
+            is_selected_month = self.data['Invoice Date'].dt.strftime('%b') == month
+            #is_next_month = self.data['Invoice Date'].dt.strftime('%b') == next_month
+
+            # Combine the two conditions
+            #combined_filter = is_selected_month | is_next_month
+
+            self.rejected_data = self.data[~is_selected_month]
+            self.data = self.data[is_selected_month]
+        else:
+            print("Data is not loaded. Please load the data first.")
 
     def get_teams(self):
         """
@@ -81,9 +101,62 @@ class TransactionData:
         if self.data is not None:
             self.data = self.data[self.data['Team'] == team_name]
         else:
-            print("Data is not loaded or no data available to filter.")
+            print("Data is not loaded or no data available to filter.")    
+
+    def get_ref_ids(self):
+            """
+            Returns a list of unique teams from the 'Team' column.
+            """
+            if self.data is not None and 'Ref ID' in self.data.columns:
+                return self.data['Ref ID'].dropna().unique()
+            return []
+    
+    def extract_pdf_data(self, ref_ids, folder_path):
+        pdf_data = {}
+        for ref_id in ref_ids:
+            file_name = f"T{ref_id}.pdf"
+            file_path = os.path.join(folder_path, file_name)
+            try:
+                with pdfplumber.open(file_path) as pdf:
+                    page = pdf.pages[0]
+                    text = page.extract_text()
+                    print(f"Processing file: {file_path}")  # Print the current PDF file being processed
+                    #print(text)  # Optionally print the text for debugging
+
+                    # Adjusted Regex to match the invoice example you provided
+                    invoice_number_pattern = r"INVOICE\s*#\s*(T\d+)"
+                    date_pattern = r"DATE\s*(\w+ \d{1,2}, \d{4})"
+
+                    invoice_number = re.search(invoice_number_pattern, text, re.IGNORECASE)
+                    invoice_date = re.search(date_pattern, text, re.IGNORECASE)
+
+                    if invoice_number and invoice_date:
+                        invoice_number = invoice_number.group(1)
+                        invoice_date = invoice_date.group(1)
+                        pdf_data[ref_id] = {'Invoice Number': invoice_number, 'Date': invoice_date}
+                    else:
+                        pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+
+            except FileNotFoundError:
+                print(f"File not found: {file_path}")
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+            except Exception as e:
+                print(f"Error processing file {file_path}: {str(e)}")
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+
+        return pdf_data
+    
+    def update_data_with_pdf_info(self, folder_path):
+        ref_ids = self.get_ref_ids()
+        pdf_info = self.extract_pdf_data(ref_ids, folder_path)
+        for index, row in self.data.iterrows():
+            ref_id = row['Ref ID']
+            if ref_id in pdf_info and pdf_info[ref_id]['Invoice Number'] is not None:
+                self.data.at[index, 'Invoice Number'] = pdf_info[ref_id]['Invoice Number']
+                self.data.at[index, 'Invoice Date'] = pdf_info[ref_id]['Date']
 
     def organize_data(self):
+
         if self.data is not None:
             # Sorting data by 'Type'
             self.data.sort_values(by='Type', inplace=True)
@@ -93,8 +166,8 @@ class TransactionData:
             service_fee_data = self.data[self.data['Type'] == 'Service Fee']
 
             # Collecting Date, Amounts, and Ref IDs into lists
-            sales = list(zip(hourly_data['Date'], hourly_data['Ref ID'], hourly_data['Amount']))
-            commissions = list(zip(service_fee_data['Date'], service_fee_data['Ref ID'], service_fee_data['Amount']))
+            sales = list(zip(hourly_data['Date'], hourly_data['Ref ID'], hourly_data['Invoice Date'], hourly_data['Invoice Number'], hourly_data['Amount']))
+            commissions = list(zip(service_fee_data['Date'], service_fee_data['Ref ID'], service_fee_data['Invoice Date'], service_fee_data['Invoice Number'], service_fee_data['Amount']))
 
             return sales, commissions
         else:
@@ -106,23 +179,23 @@ class TransactionData:
             # Calculate totals
             total_sales = sum([amount for _, _, _, _, amount in sales])
             total_commissions = sum([amount for _, _, _, _, amount in commissions])
-            balance = total_sales + total_commissions
+            balance = total_sales + total_commissions  # Adjusted to reflect net balance
 
             # Format date and team name for folder creation
             if sales:
-                date = sales[0][2]  # Invoice date from the first tuple of sales
-                folder_date = datetime.strptime(date, "%b %d, %Y").strftime('%Y-%m')
+                date = sales[0][2]  # Assume this is a datetime object
+                folder_date = date.strftime('%Y-%m')
                 team = self.data['Team'].iloc[0]  # Assuming team data is valid and present
             else:
-                date = commissions[0][2]  # Invoice date from the first tuple of commissions
-                folder_date = datetime.strptime(date, "%b %d, %Y").strftime('%Y-%m')
+                date = commissions[0][2]  # Assume this is a datetime object
+                folder_date = date.strftime('%Y-%m')
                 team = self.data['Team'].iloc[0]
 
             # Create a directory for summary
             folder_name = f"{folder_date}_{team}"
             if not os.path.exists(folder_name):
                 os.makedirs(folder_name)
-            
+
             # Create subfolders for sales and commissions
             sales_folder = os.path.join(folder_name, 'sales')
             commissions_folder = os.path.join(folder_name, 'commissions')
@@ -139,7 +212,7 @@ class TransactionData:
 
             # Save to a CSV file            
             summary_file_path = f"{folder_name}/{folder_name}.csv"
-            with open(summary_file_path, 'w') as file:                
+            with open(summary_file_path, 'w') as file:
                 file.write(f"Total Sales,{total_sales:.2f}\n")
                 file.write(f"Total Commissions,{total_commissions:.2f}\n")
                 file.write(f"Balance,{balance:.2f}\n")
@@ -177,44 +250,3 @@ class TransactionData:
             print(f"Data saved to {summary_file_path}")
         else:
             print("No data available to save.")
-
-    def get_data(self):
-        return self.data
-    
-    def extract_pdf_data(self, ref_ids, folder_path):
-        pdf_data = {}
-        for ref_id in ref_ids:
-            file_name = f"T{ref_id}.pdf"
-            file_path = os.path.join(folder_path, file_name)
-            try:
-                with pdfplumber.open(file_path) as pdf:
-                    page = pdf.pages[0]
-                    text = page.extract_text()
-                    print(f"Processing file: {file_path}")  # Print the current PDF file being processed
-                    #print(text)  # Optionally print the text for debugging
-
-                    # Adjusted Regex to match the invoice example you provided
-                    invoice_number_pattern = r"INVOICE\s*#\s*(T\d+)"
-                    date_pattern = r"DATE\s*(\w+ \d{1,2}, \d{4})"
-
-                    invoice_number = re.search(invoice_number_pattern, text, re.IGNORECASE)
-                    invoice_date = re.search(date_pattern, text, re.IGNORECASE)
-
-                    if invoice_number and invoice_date:
-                        invoice_number = invoice_number.group(1)
-                        invoice_date = invoice_date.group(1)
-                        pdf_data[ref_id] = {'Invoice Number': invoice_number, 'Date': invoice_date}
-                    else:
-                        pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
-
-            except FileNotFoundError:
-                print(f"File not found: {file_path}")
-                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
-            except Exception as e:
-                print(f"Error processing file {file_path}: {str(e)}")
-                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
-
-        return pdf_data
-
-
-    
