@@ -5,6 +5,9 @@ import re
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import shutil
+import CustomerDatabase
+import itertools
+
 
 
 class TransactionData:
@@ -175,21 +178,27 @@ class TransactionData:
             return [], []
 
     def save_summary(self, sales, commissions, folder_path):
+        team = self.data['Team'].iloc[0]
+        customer_database = CustomerDatabase.CustomerDatabase("CustomerDatabase.xml")
+        vat_rate = customer_database.get_vat_for_customer(team)
         if sales or commissions:
             # Calculate totals
-            total_sales = sum([amount for _, _, _, _, amount in sales])
+            total_sales_gross = sum([amount for _, _, _, _, amount in sales])
+            if vat_rate is None:
+                vat_rate = 0  # default to 0% if VAT is not specified
+            total_sales_net = total_sales_gross / (1 + vat_rate/100)
             total_commissions = sum([amount for _, _, _, _, amount in commissions])
-            balance = total_sales + total_commissions  # Adjusted to reflect net balance
+            balance = total_sales_gross + total_commissions  # Adjusted to reflect net balance
 
             # Format date and team name for folder creation
             if sales:
                 date = sales[0][2]  # Assume this is a datetime object
                 folder_date = date.strftime('%Y-%m')
-                team = self.data['Team'].iloc[0]  # Assuming team data is valid and present
+                #team = self.data['Team'].iloc[0]  # Assuming team data is valid and present
             else:
                 date = commissions[0][2]  # Assume this is a datetime object
                 folder_date = date.strftime('%Y-%m')
-                team = self.data['Team'].iloc[0]
+                #team = self.data['Team'].iloc[0]
 
             # Create a directory for summary
             folder_name = f"{folder_date}_{team}"
@@ -199,21 +208,19 @@ class TransactionData:
             # Create subfolders for sales and commissions
             sales_folder = os.path.join(folder_name, 'sales')
             commissions_folder = os.path.join(folder_name, 'commissions')
-           
-            # Delete the existing sales folder and its contents
-            if os.path.exists(sales_folder):
-                shutil.rmtree(sales_folder)
-            # Recreate the sales folder
-            os.makedirs(sales_folder)
-            
-            if os.path.exists(commissions_folder):
-                shutil.rmtree(commissions_folder)
-            os.makedirs(commissions_folder)
+        
+            # Delete and recreate folders as needed
+            for folder in [sales_folder, commissions_folder]:
+                if os.path.exists(folder):
+                    shutil.rmtree(folder)
+                os.makedirs(folder)
 
             # Save to a CSV file            
             summary_file_path = f"{folder_name}/{folder_name}.csv"
             with open(summary_file_path, 'w') as file:
-                file.write(f"Total Sales,{total_sales:.2f}\n")
+                file.write(f"Total Sales Gross,{total_sales_gross:.2f}\n")
+                file.write(f"VAT,{vat_rate:.2f}\n")
+                file.write(f"Total Sales Net,{total_sales_net:.2f}\n")
                 file.write(f"Total Commissions,{total_commissions:.2f}\n")
                 file.write(f"Balance,{balance:.2f}\n")
                 
@@ -222,14 +229,13 @@ class TransactionData:
                 payment_line = f"Upwork Global Inc is the agent of payment for this invoice. Payment references: {payment_references}\n"
                 file.write(payment_line)
 
-                # Write data for sales directly into the summary file
+                # Write data for sales and commissions directly into the summary file
                 file.write("\nSales\n")
                 file.write("Date,Ref ID,Invoice Date,Invoice Number,Amount\n")
                 for timestamp, ref_id, invoice_date, invoice_number, amount in sales:
                     date_only = timestamp.strftime('%Y-%m-%d')
                     file.write(f"\"{date_only}\",{ref_id},\"{invoice_date}\",{invoice_number},{amount:.2f}\n")
                 
-                # Write data for commissions directly into the summary file
                 file.write("\nCommissions\n")
                 file.write("Date,Ref ID,Invoice Date,Invoice Number,Amount\n")
                 for timestamp, ref_id, invoice_date, invoice_number, amount in commissions:
@@ -237,14 +243,12 @@ class TransactionData:
                     file.write(f"\"{date_only}\",{ref_id},\"{invoice_date}\",{invoice_number},{amount:.2f}\n")
 
                 # Copy relevant PDF invoices to sales and commissions folders
-                for timestamp, ref_id, _, _, _ in sales:
+                for (timestamp, ref_id, _, _, _), folder in itertools.chain(
+                        zip(sales, [sales_folder] * len(sales)),
+                        zip(commissions, [commissions_folder] * len(commissions))
+                    ):
                     src_pdf = os.path.join(folder_path, f"T{ref_id}.pdf")
-                    dst_pdf = os.path.join(sales_folder, f"T{ref_id}.pdf")
-                    shutil.copy(src_pdf, dst_pdf)
-
-                for timestamp, ref_id, _, _, _ in commissions:
-                    src_pdf = os.path.join(folder_path, f"T{ref_id}.pdf")
-                    dst_pdf = os.path.join(commissions_folder, f"T{ref_id}.pdf")
+                    dst_pdf = os.path.join(folder, f"T{ref_id}.pdf")
                     shutil.copy(src_pdf, dst_pdf)
 
             print(f"Data saved to {summary_file_path}")

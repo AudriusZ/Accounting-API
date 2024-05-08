@@ -1,11 +1,14 @@
 import TransactionData as TD
 from datetime import datetime
+import CustomerDatabase
 
 # Assuming you have the CSV file path
 csv_file_path = 'sample_report.csv'
 
 # Define the folder where PDFs are stored
 folder_path = 'sample_invoices'
+
+customer_database = CustomerDatabase.CustomerDatabase("CustomerDatabase.xml")
 
 # Create an instance of the class and read the data
 transaction_data = TD.TransactionData(csv_file_path)
@@ -30,6 +33,17 @@ try:
 
     team_index = int(input("Select a team by entering the number: ")) - 1
     selected_team = teams[team_index]
+    # Check if team exists in the customer database
+    if not customer_database.customer_exists(selected_team):
+        print(f"'{selected_team}' does not exist in the database. Please select:")
+        print("1. Business")
+        print("2. Private")
+        customer_type_input = int(input("Enter the number for the customer type: "))
+        customer_type = "Business" if customer_type_input == 1 else "Private"
+        customer_database.add_customer(selected_team, customer_type)
+        customer_database.save()
+    
+    
     transaction_data.filter_by_team(selected_team)
 
     # Display the filtered data by team
