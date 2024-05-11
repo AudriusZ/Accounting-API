@@ -65,24 +65,27 @@ transaction_data.update_data_with_pdf_info(folder_path)
 #data_frame = transaction_data.get_data()
 #print(data_frame)  
 
-transaction_data.filter_by_invoice_month(selected_month)
-#data_frame = transaction_data.get_data()
-#print(data_frame)  
+has_data,_ = transaction_data.filter_by_invoice_month(selected_month)
 
-#Calculate sales and comissions
-sales, commissions = transaction_data.organize_data()
+if not has_data:
+    print("There were no sales for this customer in selected month")
+else:
+     
 
-# Calculate totals and save summary as before
-total_sales = sum([amount for _, _, _, _, amount in sales])
-total_commissions = sum([amount for _, _, _, _, amount in commissions])
-balance = total_sales + total_commissions
+    #Calculate sales and comissions
+    sales, commissions = transaction_data.organize_data()
 
-# Print the updated data structures and totals to verify
+    # Calculate totals and save summary as before
+    total_sales = sum([amount for _, _, _, _, amount in sales])
+    total_commissions = sum([amount for _, _, _, _, amount in commissions])
+    balance = total_sales + total_commissions
 
-print("Total Sales:", total_sales)
-print("Total Commissions:", total_commissions)
-print("Balance:", balance)
+    # Print the updated data structures and totals to verify
 
-transaction_data.save_summary(sales, commissions, folder_path)
+    print("Total Sales:", total_sales)
+    print("Total Commissions:", total_commissions)
+    print("Balance:", balance)
+
+    transaction_data.save_summary(sales, commissions, folder_path)
 
 

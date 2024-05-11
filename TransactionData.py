@@ -71,7 +71,7 @@ class TransactionData:
                 self.data['Invoice Date'] = pd.to_datetime(self.data['Invoice Date'], errors='coerce')
 
             # Ensure month format is abbreviated (e.g., 'Jan', 'Feb', etc.)
-            month_date = pd.to_datetime('01 ' + month + ' 2000', format='%d %b %Y')
+            #month_date = pd.to_datetime('01 ' + month + ' 2000', format='%d %b %Y')
             
             # Calculate the next month
             #next_month_date = month_date + relativedelta(months=1)
@@ -86,6 +86,10 @@ class TransactionData:
 
             self.rejected_data = self.data[~is_selected_month]
             self.data = self.data[is_selected_month]
+
+            # Check if there is any data left and return a tuple
+            has_data = len(self.data) > 0
+            return (has_data, self.data)
         else:
             print("Data is not loaded. Please load the data first.")
 
