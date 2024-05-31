@@ -5,7 +5,7 @@ class InvoiceOceanAPI:
     def __init__(self, api_token, domain):
         """
         Initialize the Invoice Ocean API client.
-        :param api_token: The API token for authenticating requests.
+        :param api_token: The API token for authenticating requests.    
         :param domain: The domain for the Invoice Ocean account.
         """
         self.api_token = api_token
