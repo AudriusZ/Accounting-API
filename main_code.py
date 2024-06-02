@@ -33,6 +33,7 @@ try:
 
     team_index = int(input("Select a team by entering the number: ")) - 1
     selected_team = teams[team_index]
+    
     # Check if team exists in the customer database
     if not customer_database.customer_exists(selected_team):
         print(f"'{selected_team}' does not exist in the database. Please select:")
@@ -40,7 +41,16 @@ try:
         print("2. Private")
         customer_type_input = int(input("Enter the number for the customer type: "))
         customer_type = "Business" if customer_type_input == 1 else "Private"
-        customer_database.add_customer(selected_team, customer_type)
+
+        # Prompt for additional details
+        vat_number = input("Enter VAT number: ")
+        address_street = input("Enter address street: ")
+        address_city = input("Enter address city: ")
+        address_post_code = input("Enter address post code: ")
+        address_country = input("Enter address country: ")
+
+        # Add the new customer with all details
+        customer_database.add_customer(selected_team, customer_type, vat_number, address_street, address_city, address_post_code, address_country)
         customer_database.save()
     
     
