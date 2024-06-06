@@ -68,18 +68,18 @@ class InvoiceOceanAPI:
 
     def invoice_details(self):
         return {
-            "kind": "vat",
-            "description": "Upwork Global Inc is the agent of payment for this invoice. Payment references: T..",
+            "kind": "vat", #for vat invoices add dual currency and exchange rate
+            "description": "Upwork Global Inc is the agent of payment for this invoice. Payment references: TT698917149, TT696731290, TT694539281",
             "number": None,
-            "sell_date": "2024-04",
-            "issue_date": "2024-05-11",
-            "payment_to": "2024-05-18",
+            "sell_date": "2024-05",
+            "issue_date": "2024-05-31",
+            "payment_to": "2024-05-31",
             "payment_type": "Upwork Global Inc",
             "status": "paid",
-            "paid": "60.23",
-            "buyer_name": "Marathon Digital Holdings, Inc",
+            "paid": "1800.00",
+            "buyer_name": "ATWEO BV ",
             "positions": [
-                {"name": "Services for period (Project Name: Desalination Prototype Design)", "tax": "disabled", "total_price_gross": 1212.50, "quantity": 1}
+                {"name": "		Services for period (Project Name: CFD simulation Spiral Water Chamber Propeller turbine)", "tax": "disabled", "total_price_gross": 1800.00, "quantity": 1}
             ]
         }
 

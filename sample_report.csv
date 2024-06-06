@@ -1,4 +1,25 @@
 Date,Ref ID,Type,Description,Agency,Freelancer,Team,Account Name,PO,Amount,Amount in local currency,Currency,Balance
+"Jun 12, 2024",701221046,Service Fee,Service Fee for Hourly - Ref ID 701221026,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-37.50,,,
+"Jun 12, 2024",701221026,Hourly,Invoice for 05/27/2024-06/02/2024 - 5:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,375.00,,,
+"Jun 12, 2024",701124817,Service Fee,Service Fee for Hourly - Ref ID 701124792,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-16.00,,,
+"Jun 12, 2024",701124792,Hourly,Invoice for 05/27/2024-06/02/2024 - 2:40 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,160.00,,,
+"May 31, 2024",698917224,Service Fee,Service Fee for Hourly - Ref ID 698917207,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-48.00,,,3867.75
+"May 31, 2024",698917207,Hourly,Invoice for 05/20/2024-05/26/2024 - 8:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,480.00,,,3915.75
+"May 24, 2024",698031603,Membership Fee,Subscription Renewal Charges,,,,Audrius Zidonis,,-20.00,,,3435.75
+"May 24, 2024",696841526,Service Fee,Service Fee for Hourly - Ref ID 696841506,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-7.50,,,3455.75
+"May 24, 2024",696841506,Hourly,Invoice for 05/13/2024-05/19/2024 - 1:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,75.00,,,3463.25
+"May 24, 2024",696731379,Service Fee,Service Fee for Hourly - Ref ID 696731341,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-66.00,,,3388.25
+"May 24, 2024",696731341,Hourly,Invoice for 05/13/2024-05/19/2024 - 11:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,660.00,,,3454.25
+"May 17, 2024",694656334,Service Fee,Service Fee for Hourly - Ref ID 694656317,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-52.50,,,2794.25
+"May 17, 2024",694656317,Hourly,Invoice for 05/06/2024-05/12/2024 - 7:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,525.00,,,2846.75
+"May 17, 2024",694626121,Service Fee,Service Fee for Hourly - Ref ID 694626111,,Audrius Zidonis,Reffy Tan Hui Qi,Audrius Zidonis,,-7.07,,,2321.75
+"May 17, 2024",694626111,Hourly,Invoice for 05/06/2024-05/12/2024 - 0:40 hrs @ $106.00/hr,,Audrius Zidonis,Reffy Tan Hui Qi,Audrius Zidonis,,70.67,,,2328.82
+"May 17, 2024",694539366,Service Fee,Service Fee for Hourly - Ref ID 694539342,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-66.00,,,2258.15
+"May 17, 2024",694539342,Hourly,Invoice for 05/06/2024-05/12/2024 - 11:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,660.00,,,2324.15
+"May 10, 2024",692497814,Service Fee,Service Fee for Hourly - Ref ID 692497776,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-75.00,,,1664.15
+"May 10, 2024",692497776,Hourly,Invoice for 04/29/2024-05/05/2024 - 10:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,750.00,,,1739.15
+"May 3, 2024",691459730,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,989.15
+"May 3, 2024",691459729,Withdrawal,Bank Transfer for 998.22 EUR to xxxx-8414,,,,Audrius Zidonis,,-1091.25,998.22,EUR,990.14
 "Apr 28, 2024",689509197,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,2081.39
 "Apr 28, 2024",689509196,Withdrawal,Bank Transfer for 699.34 EUR to xxxx-8414,,,,Audrius Zidonis,,-763.20,699.34,EUR,2082.38
 "Apr 26, 2024",688130540,Service Fee,Service Fee for Hourly - Ref ID 688130522,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-53.75,,,2845.58

@@ -8,7 +8,7 @@ api_client = IO.InvoiceOceanAPI(api_token="1W1Ek5DP1MLTVFLyc2f", domain="zidonis
     
 seller_info = api_client.seller_information()
 invoice_info = api_client.invoice_details()
-buyer_info = api_client.buyer_transaction_details("Marathon Digital Holdings")
+buyer_info = api_client.buyer_transaction_details("ATWEO") #sort out complete customer names, e.g. inc.
 
 # Combine all data into one dictionary
 complete_invoice_data = {**seller_info, **invoice_info, **buyer_info}
