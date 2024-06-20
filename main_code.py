@@ -43,6 +43,7 @@ try:
         customer_type = "Business" if customer_type_input == 1 else "Private"
 
         # Prompt for additional details
+        business_name = input("Enter full business name:")
         vat_number = input("Enter VAT number: ")
         address_street = input("Enter address street: ")
         address_city = input("Enter address city: ")
@@ -50,7 +51,7 @@ try:
         address_country = input("Enter address country: ")
 
         # Add the new customer with all details
-        customer_database.add_customer(selected_team, customer_type, vat_number, address_street, address_city, address_post_code, address_country)
+        customer_database.add_customer(selected_team, customer_type, business_name, vat_number, address_street, address_city, address_post_code, address_country)
         customer_database.save()
     
     

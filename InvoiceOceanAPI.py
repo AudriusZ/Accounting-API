@@ -69,17 +69,16 @@ class InvoiceOceanAPI:
     def invoice_details(self):
         return {
             "kind": "vat", #for vat invoices add dual currency and exchange rate
-            "description": "Upwork Global Inc is the agent of payment for this invoice. Payment references: TT698917149, TT696731290, TT694539281",
+            "description": "Upwork Global Inc is the agent of payment for this invoice. Payment references: TT698917149, TT696731290, TT694539281", #get from main code
             "number": None,
-            "sell_date": "2024-05",
-            "issue_date": "2024-05-31",
-            "payment_to": "2024-05-31",
+            "sell_date": "2024-06", #get from main code
+            "issue_date": "2024-06-31", #get from main code
+            "payment_to": "2024-06-31", #get from main code
             "payment_type": "Upwork Global Inc",
             "status": "paid",
-            "paid": "1800.00",
-            "buyer_name": "ATWEO BV ",
+            "paid": "1800.00", #get from main code
             "positions": [
-                {"name": "		Services for period (Project Name: CFD simulation Spiral Water Chamber Propeller turbine)", "tax": "disabled", "total_price_gross": 1800.00, "quantity": 1}
+                {"name": "		Services for period (Project Name: <blank>)", "tax": "disabled", "total_price_gross": 1800.00, "quantity": 1}#1) get cost from main code, 2) get project name from invoices
             ]
         }
 
@@ -90,6 +89,7 @@ class InvoiceOceanAPI:
             return buyer_details
         else:
             return {
+                "buyer_name": "Buyer name not available",
                 "buyer_tax_no": "-",
                 "buyer_street": "Address not available",
                 "buyer_city": "City not available",

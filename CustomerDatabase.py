@@ -15,6 +15,12 @@ class CustomerDatabase:
             print(f"Failed to parse XML file: {e}")
             raise SystemExit("Please correct your XML file before running the script again.")
 
+    def create_blank_database(self):
+            """Creates a blank XML database with just the root element."""
+            self.root = ET.Element("Customers")
+            self.tree = ET.ElementTree(self.root)
+            self.save()  # Save the newly created blank database
+    
     def get_customer_details(self, name):
         print("Searching for:", name)
         for customer in self.root.findall('Customer'):
@@ -22,6 +28,7 @@ class CustomerDatabase:
             #print("Checking customer:", customer_name)
             if customer_name == name:
                 details = {
+                    "buyer_name": customer.find('BusinessName').text if customer.find('BusinessName').text else "_",
                     "buyer_tax_no": customer.find('VATNumber').text if customer.find('VATNumber').text else "-",
                     "buyer_street": customer.find('Street').text if customer.find('Street').text else "Address not available",
                     "buyer_city": customer.find('City').text if customer.find('City').text else "City not available",
@@ -36,7 +43,7 @@ class CustomerDatabase:
         return None
 
 
-    def add_customer(self, name, customer_type, vat_number, address_street, address_city, address_post_code, address_country):
+    def add_customer(self, name, customer_type, business_name, vat_number, address_street, address_city, address_post_code, address_country):
         if customer_type not in ["Business", "Private"]:
             raise ValueError("Type must be either 'Business' or 'Private'")
 
@@ -45,12 +52,14 @@ class CustomerDatabase:
         ET.SubElement(customer, "Name").text = name
         ET.SubElement(customer, "Type").text = customer_type
         ET.SubElement(customer, "VAT").text = str(vat)
+        ET.SubElement(customer, "BusinessName").text = business_name
         ET.SubElement(customer, "VATNumber").text = vat_number
         ET.SubElement(customer, "Street").text = address_street
         ET.SubElement(customer, "City").text = address_city
         ET.SubElement(customer, "PostCode").text = address_post_code
         ET.SubElement(customer, "Country").text = address_country
         self.root.append(customer)
+
 
     def list_customers(self):
         customers = [customer.find('Name').text for customer in self.root.findall('Customer')]
