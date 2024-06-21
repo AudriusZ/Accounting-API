@@ -1,8 +1,18 @@
 Date,Ref ID,Type,Description,Agency,Freelancer,Team,Account Name,PO,Amount,Amount in local currency,Currency,Balance
-"Jun 12, 2024",701221046,Service Fee,Service Fee for Hourly - Ref ID 701221026,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-37.50,,,
-"Jun 12, 2024",701221026,Hourly,Invoice for 05/27/2024-06/02/2024 - 5:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,375.00,,,
-"Jun 12, 2024",701124817,Service Fee,Service Fee for Hourly - Ref ID 701124792,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-16.00,,,
-"Jun 12, 2024",701124792,Hourly,Invoice for 05/27/2024-06/02/2024 - 2:40 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,160.00,,,
+"Jun 21, 2024",705744376,Service Fee,Service Fee for Hourly - Ref ID 705744362,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-105.00,,,3526.68
+"Jun 21, 2024",705744362,Hourly,Invoice for 06/10/2024-06/16/2024 - 17:30 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,1050.00,,,3631.68
+"Jun 14, 2024",703447418,Service Fee,Service Fee for Hourly - Ref ID 703447389,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-126.00,,,2581.68
+"Jun 14, 2024",703447389,Hourly,Invoice for 06/03/2024-06/09/2024 - 21:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,1260.00,,,2707.68
+"Jun 7, 2024",701221046,Service Fee,Service Fee for Hourly - Ref ID 701221026,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,-37.50,,,1447.68
+"Jun 7, 2024",701221026,Hourly,Invoice for 05/27/2024-06/02/2024 - 5:00 hrs @ $75.00/hr,,Audrius Zidonis,Marathon Digital Holdings,Audrius Zidonis,,375.00,,,1485.18
+"Jun 7, 2024",701124817,Service Fee,Service Fee for Hourly - Ref ID 701124792,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-16.00,,,1110.18
+"Jun 7, 2024",701124792,Hourly,Invoice for 05/27/2024-06/02/2024 - 2:40 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,160.00,,,1126.18
+"Jun 6, 2024",702273741,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,966.18
+"Jun 6, 2024",702273740,Withdrawal,Bank Transfer for 1465.81 EUR to xxxx-8414,,,,Audrius Zidonis,,-1620.00,1465.81,EUR,967.17
+"Jun 6, 2024",702272669,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,2587.17
+"Jun 6, 2024",702272668,Withdrawal,Bank Transfer for 1099.35 EUR to xxxx-8414,,,,Audrius Zidonis,,-1215.00,1099.35,EUR,2588.16
+"Jun 6, 2024",702270858,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,3803.16
+"Jun 6, 2024",702270857,Withdrawal,Bank Transfer for 57.55 EUR to xxxx-8414,,,,Audrius Zidonis,,-63.60,57.55,EUR,3804.15
 "May 31, 2024",698917224,Service Fee,Service Fee for Hourly - Ref ID 698917207,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-48.00,,,3867.75
 "May 31, 2024",698917207,Hourly,Invoice for 05/20/2024-05/26/2024 - 8:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,480.00,,,3915.75
 "May 24, 2024",698031603,Membership Fee,Subscription Renewal Charges,,,,Audrius Zidonis,,-20.00,,,3435.75

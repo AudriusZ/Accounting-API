@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 class InvoiceOceanAPI:
     def __init__(self, api_token, domain, customer_db):
@@ -66,19 +67,33 @@ class InvoiceOceanAPI:
             "description_footer": "Židonis, MB, trading as Zidonis Engineering, is the legal entity issuing this invoice. Thank you for your business."
         }
 
-    def invoice_details(self):
+    def invoice_details(self, paid, date, references, project_name):
+        # Convert the string date to a datetime object
+        date_obj = datetime.strptime(date, '%Y-%m-%d')
+        
+        # Format the date to 'YYYY-MM'
+        sell_date = date_obj.strftime('%Y-%m')        
+
+        # Format description with dynamic references
+        description = f"Upwork Global Inc is the agent of payment for this invoice. Payment references: {references}"
+
         return {
-            "kind": "vat", #for vat invoices add dual currency and exchange rate
-            "description": "Upwork Global Inc is the agent of payment for this invoice. Payment references: TT698917149, TT696731290, TT694539281", #get from main code
+            "kind": "vat",  # for VAT invoices add dual currency and exchange rate
+            "description": description,
             "number": None,
-            "sell_date": "2024-06", #get from main code
-            "issue_date": "2024-06-31", #get from main code
-            "payment_to": "2024-06-31", #get from main code
+            "sell_date": sell_date, 
+            "issue_date": date, 
+            "payment_to": date, 
             "payment_type": "Upwork Global Inc",
             "status": "paid",
-            "paid": "1800.00", #get from main code
+            "paid": paid,
             "positions": [
-                {"name": "		Services for period (Project Name: <blank>)", "tax": "disabled", "total_price_gross": 1800.00, "quantity": 1}#1) get cost from main code, 2) get project name from invoices
+                {
+                    "name": f"Services for period (Project Name: {project_name})", 
+                    "tax": "disabled", 
+                    "total_price_gross": paid, 
+                    "quantity": 1
+                }
             ]
         }
 

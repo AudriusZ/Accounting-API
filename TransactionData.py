@@ -118,6 +118,8 @@ class TransactionData:
                 return self.data['Ref ID'].dropna().unique()
             return []
     
+    
+    
     def extract_pdf_data(self, ref_ids, folder_path):
         pdf_data = {}
         for ref_id in ref_ids:
