@@ -21,6 +21,7 @@ class TransactionData:
     def read_data(self):
         try:
             self.data = pd.read_csv(self.file_path, parse_dates=['Date'])
+            print(self.data['Date'].head())  # Add this to see the format
         except FileNotFoundError:
             print("The file was not found.")
         except pd.errors.EmptyDataError:
