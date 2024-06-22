@@ -1,3 +1,5 @@
+#This class deals with invoice data and summary extracted from Upwork
+
 import pandas as pd
 import os
 import pdfplumber
@@ -117,9 +119,7 @@ class TransactionData:
             if self.data is not None and 'Ref ID' in self.data.columns:
                 return self.data['Ref ID'].dropna().unique()
             return []
-    
-    
-    
+
     def extract_pdf_data(self, ref_ids, folder_path):
         pdf_data = {}
         for ref_id in ref_ids:
@@ -130,28 +130,32 @@ class TransactionData:
                     page = pdf.pages[0]
                     text = page.extract_text()
                     print(f"Processing file: {file_path}")  # Print the current PDF file being processed
-                    #print(text)  # Optionally print the text for debugging
 
-                    # Adjusted Regex to match the invoice example you provided
+                    # Existing Regex patterns
                     invoice_number_pattern = r"INVOICE\s*#\s*(T\d+)"
                     date_pattern = r"DATE\s*(\w+ \d{1,2}, \d{4})"
+                    contract_title_pattern = r"Contract title:\s*(.+)\n"  # New pattern for extracting contract title
 
+                    # Extracting data using Regex
                     invoice_number = re.search(invoice_number_pattern, text, re.IGNORECASE)
                     invoice_date = re.search(date_pattern, text, re.IGNORECASE)
+                    contract_title = re.search(contract_title_pattern, text, re.IGNORECASE)  # Searching for contract title
 
+                    # Check if data was found and assign to dictionary
                     if invoice_number and invoice_date:
                         invoice_number = invoice_number.group(1)
                         invoice_date = invoice_date.group(1)
-                        pdf_data[ref_id] = {'Invoice Number': invoice_number, 'Date': invoice_date}
+                        contract_title = contract_title.group(1) if contract_title else None  # Handles missing contract title
+                        pdf_data[ref_id] = {'Invoice Number': invoice_number, 'Date': invoice_date, 'Contract Title': contract_title}
                     else:
-                        pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+                        pdf_data[ref_id] = {'Invoice Number': None, 'Date': None, 'Contract Title': None}
 
             except FileNotFoundError:
                 print(f"File not found: {file_path}")
-                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None, 'Contract Title': None}
             except Exception as e:
                 print(f"Error processing file {file_path}: {str(e)}")
-                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None}
+                pdf_data[ref_id] = {'Invoice Number': None, 'Date': None, 'Contract Title': None}
 
         return pdf_data
     
@@ -159,13 +163,13 @@ class TransactionData:
         ref_ids = self.get_ref_ids()
         pdf_info = self.extract_pdf_data(ref_ids, folder_path)
         for index, row in self.data.iterrows():
-            ref_id = row['Ref ID']
-            if ref_id in pdf_info and pdf_info[ref_id]['Invoice Number'] is not None:
-                self.data.at[index, 'Invoice Number'] = pdf_info[ref_id]['Invoice Number']
-                self.data.at[index, 'Invoice Date'] = pdf_info[ref_id]['Date']
+                ref_id = row['Ref ID']
+                if ref_id in pdf_info and pdf_info[ref_id]['Invoice Number'] is not None:
+                    self.data.at[index, 'Invoice Number'] = pdf_info[ref_id]['Invoice Number']
+                    self.data.at[index, 'Invoice Date'] = pdf_info[ref_id]['Date']
+                    self.data.at[index, 'Contract Title'] = pdf_info[ref_id]['Contract Title']
 
     def organize_data(self):
-
         if self.data is not None:
             # Sorting data by 'Type'
             self.data.sort_values(by='Type', inplace=True)
@@ -178,10 +182,20 @@ class TransactionData:
             sales = list(zip(hourly_data['Date'], hourly_data['Ref ID'], hourly_data['Invoice Date'], hourly_data['Invoice Number'], hourly_data['Amount']))
             commissions = list(zip(service_fee_data['Date'], service_fee_data['Ref ID'], service_fee_data['Invoice Date'], service_fee_data['Invoice Number'], service_fee_data['Amount']))
 
-            return sales, commissions
+            # Collecting Contract Titles separately and checking for identical titles
+            contract_titles = list(service_fee_data['Contract Title'].dropna().unique())
+            
+            # Check if all contract titles are identical
+            if len(contract_titles) == 1:
+                contract_title = contract_titles[0]  # If all identical, return only one title
+            else:
+                contract_title = contract_titles  # If not identical, return the list or handle differently
+
+            return sales, commissions, contract_title
         else:
             print("Data is not loaded or not available.")
-            return [], []
+            return [], [], None
+
 
     def save_summary(self, sales, commissions, folder_path):
         team = self.data['Team'].iloc[0]

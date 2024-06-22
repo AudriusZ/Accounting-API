@@ -93,7 +93,7 @@ else:
      
 
     #Calculate sales and comissions
-    sales, commissions = transaction_data.organize_data()
+    sales, commissions, project_name = transaction_data.organize_data()
 
     # Calculate totals and save summary as before
     total_sales = sum([amount for _, _, _, _, amount in sales])
@@ -126,7 +126,7 @@ else:
     #references = ", ".join(formatted_refs)
 
     #project_name = "Desalination Prototype Design"    
-    project_name = "CFD simulation Spiral Water Chamber Propeller turbine"
+    #project_name = "CFD simulation Spiral Water Chamber Propeller turbine"
     
     # Convert selected month name to date
     year_today = datetime.now().year  # You can adjust the year as needed
@@ -137,8 +137,8 @@ else:
     
     # Confirm invoice date or enter a new one
     print(f"Suggested Invoice Date: {invoice_date}")
-    user_input = input("Is this date correct? (yes/no): ")
-    if user_input.lower() != 'yes':
+    user_input = input("Is this date correct? (y/n): ")
+    if user_input.lower() != 'y':
         new_date = input("Enter the new date (format YYYY-MM-DD): ")
         try:
             # Validate and parse the user-provided date to ensure it's correct
