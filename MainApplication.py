@@ -14,18 +14,19 @@ class MainApplication:
 
     def run(self):
         self.transaction_data.read_data()
-        month = self.select_month()
+        selected_month = self.select_month()
         team = self.select_team()
         if not self.customer_database.customer_exists(team):
             self.add_new_customer(team)
         self.update_transaction_data_with_pdf()
-        self.issue_invoice(month, team)
-        self.save_summary_locally(month, team)
+        self.transaction_data.filter_by_invoice_month(selected_month)
+        self.issue_invoice(selected_month, team)
+        self.save_summary_locally(selected_month, team)
 
     def select_month(self):
         months = self.transaction_data.get_months()
         selected_month = UserInteraction.select_option("Available Months:", months)
-        self.transaction_data.filter_by_month(selected_month)
+        self.transaction_data.filter_by_summary_month(selected_month)
         return selected_month
 
     def select_team(self):

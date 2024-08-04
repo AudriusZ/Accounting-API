@@ -42,7 +42,7 @@ class TransactionData:
             return self.data['Date'].dt.strftime('%b').dropna().unique()
         return []
 
-    def filter_by_month(self, month):
+    def filter_by_summary_month(self, month):
         if self.data is not None:
             # Convert 'Date' to datetime if not already
             if not pd.api.types.is_datetime64_any_dtype(self.data['Date']):
