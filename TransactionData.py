@@ -74,26 +74,28 @@ class TransactionData:
 
     def filter_by_invoice_month(self, month):
         if self.data is not None:
-            # Convert 'Date' to datetime if not already
+            print("Data before everything:\n", self.data)
+            
+            # Define the date format
+            date_format = '%b %d, %Y'
+            
+            # Convert 'Invoice Date' to datetime if not already
             if not pd.api.types.is_datetime64_any_dtype(self.data['Invoice Date']):
-                self.data['Invoice Date'] = pd.to_datetime(self.data['Invoice Date'], errors='coerce')
+                self.data['Invoice Date'] = pd.to_datetime(self.data['Invoice Date'], format=date_format, errors='coerce')
 
             # Ensure month format is abbreviated (e.g., 'Jan', 'Feb', etc.)
-            #month_date = pd.to_datetime('01 ' + month + ' 2000', format='%d %b %Y')
-            
-            # Calculate the next month
-            #next_month_date = month_date + relativedelta(months=1)
-            #next_month = next_month_date.strftime('%b')
+            print("Filtering for month:", month)
 
-            # Filter data by month and the consecutive month
+            # Filter data by month
             is_selected_month = self.data['Invoice Date'].dt.strftime('%b') == month
-            #is_next_month = self.data['Invoice Date'].dt.strftime('%b') == next_month
-
-            # Combine the two conditions
-            #combined_filter = is_selected_month | is_next_month
+            
+            print("Data before filtering:\n", self.data)
+            print("Selected month filter:\n", is_selected_month)
 
             self.rejected_data = self.data[~is_selected_month]
             self.data = self.data[is_selected_month]
+
+            print("Data after filtering:\n", self.data)
 
             # Check if there is any data left and return a tuple
             has_data = len(self.data) > 0
