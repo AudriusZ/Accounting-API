@@ -55,12 +55,17 @@ class TransactionData:
             next_month_date = month_date + relativedelta(months=1)
             next_month = next_month_date.strftime('%b')
 
-            # Filter data by month and the consecutive month
+            # Calculate the previous month
+            previous_month_date = month_date - relativedelta(months=1)
+            previous_month = next_month_date.strftime('%b')
+
+            # Filter data by selected month, previous month and the consecutive month
             is_selected_month = self.data['Date'].dt.strftime('%b') == month
             is_next_month = self.data['Date'].dt.strftime('%b') == next_month
+            is_previous_month = self.data['Date'].dt.strftime('%b') == previous_month
 
             # Combine the two conditions
-            combined_filter = is_selected_month | is_next_month
+            combined_filter = is_selected_month | is_next_month | is_previous_month
 
             self.rejected_data = self.data[~combined_filter]
             self.data = self.data[combined_filter]
