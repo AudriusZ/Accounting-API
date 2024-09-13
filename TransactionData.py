@@ -183,7 +183,7 @@ class TransactionData:
             self.data.sort_values(by='Type', inplace=True)
 
             # Filtering and collecting 'Hourly' and 'Service Fee' data
-            hourly_data = self.data[self.data['Type'] == 'Hourly']
+            hourly_data = self.data[self.data['Type'].isin(['Fixed Price', 'Hourly'])]
             service_fee_data = self.data[self.data['Type'] == 'Service Fee']
 
             # Collecting Date, Amounts, and Ref IDs into lists

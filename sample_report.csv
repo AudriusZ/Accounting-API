@@ -1,4 +1,10 @@
 Date,Ref ID,Type,Description,Agency,Freelancer,Team,Account Name,PO,Amount,Amount in local currency,Currency,Balance
+"Sep 16, 2024",732917239,Service Fee,Service Fee for Fixed Price - Ref ID 732917238,,Audrius Zidonis,Sofia Piustonen,Audrius Zidonis,,-7.50,,,
+"Sep 16, 2024",732917238,Fixed Price,Invoice for MATLAB Educational Video Course: Milestone 1 - Test task,,Audrius Zidonis,Sofia Piustonen,Audrius Zidonis,,75.00,,,
+"Sep 13, 2024",731847439,Service Fee,Service Fee for Hourly - Ref ID 731847417,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-48.00,,,1764.25
+"Sep 13, 2024",731847417,Hourly,Invoice for 09/02/2024-09/08/2024 - 8:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,480.00,,,1812.25
+"Sep 6, 2024",731115396,Withdrawal Fee,Withdrawal Fee - Direct to Local Bank,,,,Audrius Zidonis,,-0.99,,,1332.25
+"Sep 6, 2024",731115395,Withdrawal,Bank Transfer for 4327.17 EUR to xxxx-8414,,,,Audrius Zidonis,,-4887.00,4327.17,EUR,1333.24
 "Sep 6, 2024",729689094,Service Fee,Service Fee for Hourly - Ref ID 729689080,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-48.00,,,6220.24
 "Sep 6, 2024",729689080,Hourly,Invoice for 08/26/2024-09/01/2024 - 8:00 hrs @ $60.00/hr,,Audrius Zidonis,ATWEO,Audrius Zidonis,,480.00,,,6268.24
 "Aug 30, 2024",727522607,Service Fee,Service Fee for Hourly - Ref ID 727522587,,Audrius Zidonis,ATWEO,Audrius Zidonis,,-165.00,,,5788.24
