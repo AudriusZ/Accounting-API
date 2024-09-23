@@ -111,7 +111,7 @@ if __name__ == "__main__":
         api_token="1W1Ek5DP1MLTVFLyc2f",
         domain="zidoniseng",
         customer_db_file="CustomerDatabase.xml",
-        csv_file_path='sample_report.csv',
-        folder_path='sample_invoices'
+        csv_file_path='transaction_report.csv',
+        folder_path='transaction_reports'
     )
     app.run()
