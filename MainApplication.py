@@ -61,15 +61,17 @@ class MainApplication:
         total_sales = sum([amount for _, _, _, _, amount in sales])
 
         seller_info = self.api_client.seller_information()
+        buyer_info_direct, buyer_info_variable = self.api_client.buyer_transaction_details(team)
         invoice_info = self.api_client.invoice_details(
+            buyer_info = buyer_info_variable,
             paid=total_sales,
             date=invoice_date.strftime('%Y-%m-%d'),
             references=invoice_numbers_str,
             project_name=project_name
         )
-        buyer_info = self.api_client.buyer_transaction_details(team)
+        
 
-        complete_invoice_data = {**seller_info, **invoice_info, **buyer_info}
+        complete_invoice_data = {**seller_info, **invoice_info, **buyer_info_direct}
         self.api_client.create_invoice(complete_invoice_data)
         print("Invoice created successfully.")
 

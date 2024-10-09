@@ -27,7 +27,7 @@ class CustomerDatabase:
             customer_name = customer.find('Name').text
             #print("Checking customer:", customer_name)
             if customer_name == name:
-                details = {
+                details_direct = {
                     "buyer_name": customer.find('BusinessName').text if customer.find('BusinessName').text else "_",
                     "buyer_tax_no": customer.find('VATNumber').text if customer.find('VATNumber').text else "-",
                     "buyer_street": customer.find('Street').text if customer.find('Street').text else "Address not available",
@@ -35,8 +35,12 @@ class CustomerDatabase:
                     "buyer_post_code": customer.find('PostCode').text if customer.find('PostCode').text else "Post code not available",
                     "buyer_country": customer.find('Country').text if customer.find('Country').text else "Country not available"
                 }
+                details_variable = {
+                    "buyer_type": customer.find('Type').text if customer.find('Type') is not None else "Business",
+                    "vat_rate": int(customer.find('VAT').text) if customer.find('VAT') is not None else 0,                    
+                }
                 #print("Found details:", details)
-                return details
+                return details_direct, details_variable
             else:
                 print(f"No match for {name} in {customer_name}")
         #print("No customer found with name:", name)

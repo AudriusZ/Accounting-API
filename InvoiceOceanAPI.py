@@ -67,7 +67,7 @@ class InvoiceOceanAPI:
             "description_footer": "Židonis, MB, trading as Zidonis Engineering, is the legal entity issuing this invoice. Thank you for your business."
         }
 
-    def invoice_details(self, paid, date, references, project_name):
+    def invoice_details(self, buyer_info, paid, date, references, project_name):
         # Convert the string date to a datetime object
         date_obj = datetime.strptime(date, '%Y-%m-%d')
         
@@ -77,31 +77,60 @@ class InvoiceOceanAPI:
         # Format description with dynamic references
         description = f"Upwork Global Inc is the agent of payment for this invoice. Payment references: {references}"
 
-        return {
-            "kind": "vat",  # for VAT invoices add dual currency and exchange rate
-            "description": description,
-            "number": None,
-            "sell_date": sell_date, 
-            "issue_date": date, 
-            "payment_to": date, 
-            "payment_type": "Upwork Global Inc",
-            "status": "paid",
-            "paid": paid,
-            "positions": [
-                {
-                    "name": f"Services for period (Project Name: {project_name})", 
-                    "tax": "disabled", 
-                    "total_price_gross": paid, 
-                    "quantity": 1
-                }
-            ]
-        }
+        buyer_type = buyer_info.get('buyer_type')
+        vat_rate = buyer_info.get('vat_rate')
+
+        if buyer_type == "Private":
+            return {
+                "kind": "vat",
+                "exchange_currency": "EUR",
+                "exchange_kind": "ecb",
+                "description": description,
+                "number": None,
+                "sell_date": sell_date,
+                "issue_date": date,
+                "payment_to": date,
+                "payment_type": "Upwork Global Inc",
+                "status": "paid",
+                "paid": paid,
+                "positions": [
+                    {
+                        "name": f"Services for period (Project Name: {project_name})",
+                        "tax": vat_rate,  # Include the VAT rate for private customers
+                        "total_price_gross": paid,
+                        "quantity": 1
+                    }
+                ]
+            }
+        
+        elif buyer_type == "Business":
+            return {
+                "kind": "vat",  # for VAT invoices add dual currency and exchange rate
+                "description": description,
+                "number": None,
+                "sell_date": sell_date, 
+                "issue_date": date, 
+                "payment_to": date, 
+                "payment_type": "Upwork Global Inc",
+                "status": "paid",
+                "paid": paid,
+                "positions": [
+                    {
+                        "name": f"Services for period (Project Name: {project_name})", 
+                        "tax": "disabled", 
+                        "total_price_gross": paid, 
+                        "quantity": 1
+                    }
+                ]
+            }
+        else:
+            raise ValueError(f"Unsupported buyer type: '{buyer_type}'. Expected 'Private' or 'Business'.")
 
     # Method to fetch buyer details from the XML database
     def buyer_transaction_details(self, customer_name):
-        buyer_details = self.customer_db.get_customer_details(customer_name)
-        if buyer_details:
-            return buyer_details
+        buyer_details_direct, buyer_details_variable = self.customer_db.get_customer_details(customer_name)
+        if buyer_details_direct:
+            return buyer_details_direct, buyer_details_variable
         else:
             return {
                 "buyer_name": "Buyer name not available",
