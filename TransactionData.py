@@ -195,6 +195,7 @@ class TransactionData:
         if excluded_ids:
             print(f"Found {len(excluded_ids)} previously processed transactions in log. Excluding them.")
             # Ensure Ref ID is string for comparison
+            self.data = self.data.copy()
             self.data['Ref ID'] = self.data['Ref ID'].astype(str)
             initial_count = len(self.data)
             self.data = self.data[~self.data['Ref ID'].isin(excluded_ids)]
@@ -281,6 +282,12 @@ class TransactionData:
 
     
     def update_data_with_pdf_info(self, folder_path):
+        # Initialize columns if they don't exist to prevent KeyErrors on empty DataFrames
+        if 'Invoice Number' not in self.data.columns:
+            self.data['Invoice Number'] = None
+        if 'Invoice Date' not in self.data.columns:
+            self.data['Invoice Date'] = None
+
         ref_ids = self.get_ref_ids()
         pdf_info = self.extract_pdf_data(ref_ids, folder_path)
         for index, row in self.data.iterrows():
