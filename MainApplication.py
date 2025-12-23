@@ -22,6 +22,9 @@ class MainApplication:
         while True:
             self.transaction_data.read_data()
             selected_month = self.select_month()
+            if not selected_month:
+                print("No month selected or data unavailable. Exiting.")
+                break
             team = self.select_team()
             if team is None:
                 print("No customers found for this month. Please try another month.")
@@ -40,7 +43,8 @@ class MainApplication:
     def select_month(self):
         months = self.transaction_data.get_months()
         selected_month = UserInteraction.select_option("Available Months:", months)
-        self.transaction_data.filter_by_summary_month(selected_month)
+        if selected_month:
+            self.transaction_data.filter_by_summary_month(selected_month)
         return selected_month
 
     def select_team(self):
@@ -139,11 +143,12 @@ if __name__ == "__main__":
     private_dir = "private_data"
 
     # Find transaction report files dynamically using 'transaction_report' as a qualifier
-    search_pattern = os.path.join(private_dir, '*transaction_report*.csv')
-    files = glob.glob(search_pattern)
+    # Check both the root of private_data and the transaction_reports subdirectory
+    files = glob.glob(os.path.join(private_dir, '*transaction_report*.csv')) + \
+            glob.glob(os.path.join(private_dir, 'transaction_reports', '*transaction_report*.csv'))
 
     if not files:
-        print(f"Error: No transaction report file found matching '{search_pattern}'.")
+        print(f"Error: No transaction report file found in '{private_dir}' or '{private_dir}/transaction_reports'.")
         print(f"Please make sure the CSV file is in the '{private_dir}' directory.")
         sys.exit(1)
     

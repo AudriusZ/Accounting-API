@@ -118,9 +118,9 @@ class InvoiceOceanAPI:
 
     # Method to fetch buyer details from the XML database
     def buyer_transaction_details(self, customer_name):
-        buyer_details_direct, buyer_details_variable = self.customer_db.get_customer_details(customer_name)
-        if buyer_details_direct:
-            return buyer_details_direct, buyer_details_variable
+        result = self.customer_db.get_customer_details(customer_name)
+        if result:
+            return result
         else:
             return {
                 "buyer_name": "Buyer name not available",
@@ -129,6 +129,7 @@ class InvoiceOceanAPI:
                 "buyer_city": "City not available",
                 "buyer_post_code": "Post code not available",
                 "buyer_country": "Country not available"
+            }, {
+                "buyer_type": "Business",
+                "vat_rate": 0
             }
-
-
