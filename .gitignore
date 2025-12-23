@@ -1,0 +1,9 @@
+# Ignore the private data folder (this will be a separate private repo)
+private_data/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.spec
+build/
+dist/

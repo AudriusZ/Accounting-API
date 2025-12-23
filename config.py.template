@@ -1,0 +1,17 @@
+API_TOKEN = "YOUR_INVOICE_OCEAN_API_TOKEN"
+DOMAIN = "your_domain_prefix" # e.g., if https://mycompany.invoiceocean.com, enter "mycompany"
+
+SELLER_INFO = {
+    "seller_name": "Your Company Name",
+    "seller_post_code": "Zip Code",
+    "seller_city": "City",
+    "seller_street": "Street Address",
+    "seller_country": "Country Code (e.g., LT)",
+    "seller_email": "email@example.com",
+    "seller_www": "www.example.com",
+    "seller_phone": "+123456789",
+    "seller_tax_no": "Tax/VAT Number",
+    "seller_bank_account": "IBAN or Account Number",
+    "seller_bank": "Bank Name and SWIFT",
+    "description_footer": "Legal footer text for invoices."
+}
