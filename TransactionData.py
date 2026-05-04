@@ -72,9 +72,21 @@ class TransactionData:
     def get_months(self):
         """
         Returns a list of unique months from the 'Date' column.
+        Includes the previous and next months to account for Upwork's billing cycle overlap.
         """
         if self.data is not None:
-            return self.data['Date'].dt.strftime('%b').dropna().unique()
+            csv_dates = self.data['Date'].dropna()
+            if csv_dates.empty:
+                return []
+            
+            months = set()
+            for d in csv_dates:
+                months.add(d.strftime('%b'))
+                months.add((d - relativedelta(months=1)).strftime('%b'))
+                months.add((d + relativedelta(months=1)).strftime('%b'))
+                
+            # Sort months by calendar order (Jan, Feb, Mar, etc.)
+            return sorted(list(months), key=lambda m: datetime.strptime(m, '%b').month)
         return []
 
     def filter_by_summary_month(self, month):
@@ -145,23 +157,9 @@ class TransactionData:
         Returns a list of unique teams from the 'Team' column.
         """
         if self.data is not None and 'Team' in self.data.columns:
-            teams = self.data['Team'].dropna().unique()
-            
-            filtered_teams = []
-            for team in teams:
-                team_data = self.data[self.data['Team'] == team]
-                team_months = team_data['Date'].dt.strftime('%b').unique()
-                
-                # 1. If team has data in the Previous Month ONLY -> Exclude
-                if self.previous_month_filter and len(team_months) == 1 and team_months[0] == self.previous_month_filter:
-                    continue
-                
-                # 2. If team has data in the Next Month ONLY -> Check dates
-                if self.next_month_filter and len(team_months) == 1 and team_months[0] == self.next_month_filter:
-                    continue
-
-                filtered_teams.append(team)
-            return filtered_teams
+            # We no longer strictly exclude teams whose CSV dates are in adjacent months,
+            # allowing them to be selected in case their actual PDF date shifted.
+            return list(self.data['Team'].dropna().unique())
         return []
 
     def filter_by_team(self, team_name):
